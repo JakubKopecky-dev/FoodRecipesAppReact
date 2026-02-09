@@ -1,3 +1,4 @@
+import CategoryList from "./components/category/categoryList"
 import RecipeList from "./components/recipe/RecipeList"
 import { AppBar, Toolbar, Typography, Container } from '@mui/material'
 
@@ -14,6 +15,10 @@ function App() {
 
       <Container maxWidth="md" sx={{mt: 4}}>
         <RecipeList/>
+      </Container>
+
+      <Container maxWidth="md" sx={{mt:4}}>
+        <CategoryList/>
       </Container>
 
     </>
