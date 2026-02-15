@@ -1,25 +1,28 @@
-import CategoryList from "./components/category/categoryList"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import RecipeList from "./components/recipe/RecipeList"
 import { AppBar, Toolbar, Typography, Container } from '@mui/material'
+import RecipeDetail from "./components/recipe/RecipeDetail"
 
 function App() {
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div">
-            Recepty
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <BrowserRouter>
+        <AppBar position="static"  >
+          <Toolbar sx={{ justifyContent: 'center', height: 80 }}>
+            <Typography variant="h6" component="div" fontSize={35} >
+              Recepty
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-      <Container maxWidth="md" sx={{mt: 4}}>
-        <RecipeList/>
-      </Container>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Routes>
+          <Route path="/" element={<RecipeList/>} />
+          <Route path="/recipes/:id" element={<RecipeDetail/>}/>
+          </Routes>
+        </Container>
 
-      <Container maxWidth="md" sx={{mt:4}}>
-        <CategoryList/>
-      </Container>
+      </BrowserRouter>
 
     </>
   )

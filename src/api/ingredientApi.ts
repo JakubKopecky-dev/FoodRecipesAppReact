@@ -1,7 +1,7 @@
 import type { CreateUpdateIngredient } from "../types/ingredient/CreateUpdateIngredient";
 import type { Ingredient } from "../types/ingredient/Ingredient";
 
-const BASE_URL = 'http://localhost:7500/api/Ingredient';
+const BASE_URL = 'https://localhost:7244/api/Ingredient';
 
 export async function getIngredientById(ingredientId: string): Promise<Ingredient> {
     const response = await fetch(`${BASE_URL}/${ingredientId}`);

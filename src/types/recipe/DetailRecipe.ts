@@ -1,7 +1,7 @@
 import type { Ingredient } from "../ingredient/Ingredient";
-import type { Recipe } from "./Recipe";
+import type { RecipeWithCategory } from "./RecipeWithCategory";
 
 export interface DetailRecipe{
-    recipe: Recipe
+    recipe: RecipeWithCategory
     ingredients: Ingredient[]
 }

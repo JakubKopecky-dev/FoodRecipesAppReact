@@ -1,7 +1,7 @@
 import type { Category } from "../types/category/Category";
 import type { CreateCategory } from "../types/category/CreateCategory";
 
-const BASE_URL = 'http://localhost:7500/api/Category';
+const BASE_URL = 'https://localhost:7244/api/Category';
 
 export async function getAllCategories(): Promise<Category[]> {
     const response = await fetch(BASE_URL);

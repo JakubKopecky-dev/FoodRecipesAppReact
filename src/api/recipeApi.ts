@@ -5,7 +5,7 @@ import type { Recipe } from "../types/recipe/Recipe";
 import type { RecipeWithCategory } from "../types/recipe/RecipeWithCategory";
 import type { UpdateRecipe } from "../types/recipe/UpdateRecipe";
 
-const BASE_URL = 'http://localhost:7500/api/Recipe';
+const BASE_URL = 'https://localhost:7244/api/Recipe';
 
 export async function getAllRecipes(): Promise<RecipeWithCategory[]> {
     const response = await fetch(BASE_URL);
@@ -39,7 +39,7 @@ export async function getRecipeById(recipeId: string): Promise<Recipe> {
 
 
 export async function getRecipeDateilById(recipeId: string): Promise<DetailRecipe> {
-    const response = await fetch(`${BASE_URL}/${recipeId}`);
+    const response = await fetch(`${BASE_URL}/${recipeId}/detail`);
 
     if (response.status === 404)
         throw new Error('Recipe not found')
