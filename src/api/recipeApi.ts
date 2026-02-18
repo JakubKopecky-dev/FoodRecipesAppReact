@@ -54,7 +54,7 @@ export async function getRecipeDateilById(recipeId: string): Promise<DetailRecip
 
 
 
-export async function CreateRecipe(recipe: CreateRecipe): Promise<RecipeWithCategory> {
+export async function createRecipe(recipe: CreateRecipe): Promise<RecipeWithCategory> {
     const response = await fetch(BASE_URL, {
         method: 'POST',
         headers: {

@@ -1,24 +1,23 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import RecipeList from "./components/recipe/RecipeList"
-import { AppBar, Toolbar, Typography, Container } from '@mui/material'
+import { Container } from '@mui/material'
 import RecipeDetail from "./components/recipe/RecipeDetail"
+import RecipeForm from "./components/recipe/RecipeForm"
+import MainMenu from "./components/mainMenu/MainMenu"
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <AppBar position="static"  >
-          <Toolbar sx={{ justifyContent: 'center', height: 80 }}>
-            <Typography variant="h6" component="div" fontSize={35} >
-              Recepty
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <MainMenu/>
 
         <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Routes>
-          <Route path="/" element={<RecipeList/>} />
-          <Route path="/recipes/:id" element={<RecipeDetail/>}/>
+            <Route path="/" element={<Navigate to="/recipes" />} />
+            <Route path="/recipes" element={<RecipeList />} />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+            <Route path="/recipes/create" element={< RecipeForm />} />
+            <Route path="/recipes/:id/edit" element={<RecipeForm />} />
           </Routes>
         </Container>
 

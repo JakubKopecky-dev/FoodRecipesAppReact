@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import type { DetailRecipe } from "../../types/recipe/DetailRecipe";
 import { getRecipeDateilById } from "../../api/recipeApi";
 import { Alert, Box, Chip, CircularProgress, Paper, Rating, Stack, Typography } from "@mui/material";
@@ -31,7 +31,7 @@ function RecipeDetail() {
 
     if (loading)
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 <CircularProgress />
             </Box>
         );
