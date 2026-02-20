@@ -11,19 +11,23 @@ function RecipeList() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getAllRecipes()
-            .then(data => {
+        const loadRecipes = async () => {
+            try {
+                const data = await getAllRecipes();
                 setRecipes(data);
-            })
-            .catch(err => {
-                setError(err.message);
-            })
-            .finally(() => {
+            }
+            catch (err) {
+                setError(err instanceof Error ? err.message : "Unexpected error");
+            }
+            finally {
                 setLoading(false)
-            })
+            }
+        }
+
+        loadRecipes();
     }, [])
 
-    const navigate =  useNavigate();
+    const navigate = useNavigate();
     const handleOpenDetail = (id: string) => {
         navigate(`/recipes/${id}`)
     }
@@ -64,7 +68,7 @@ function RecipeList() {
 
                         >
                             {/* TITLE */}
-                            <Box sx={{flex: 1 }}>
+                            <Box sx={{ flex: 1 }}>
                                 <Typography sx={{ fontSize: { xs: 16, sm: 22 }, fontWeight: 500 }}>
                                     {recipe.title}
                                 </Typography>

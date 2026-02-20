@@ -1,7 +1,7 @@
 import { Alert, Autocomplete, Box, Button, Paper, Rating, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createRecipe, patchRecipeCategories, updateRecipe } from "../../api/recipeApi";
+import { createRecipe, getRecipeDateilById, patchRecipeCategories, updateRecipe } from "../../api/recipeApi";
 import type { CreateRecipe } from "../../types/recipe/CreateRecipe";
 import type { UpdateRecipe } from "../../types/recipe/UpdateRecipe";
 import type { PatchRecipeCategories } from "../../types/recipe/PatchRecipeCategories";
@@ -15,7 +15,7 @@ function RecipeForm() {
     const [title, setTitle] = useState<string>("");
     const [categoryNames, setCategoryNames] = useState<string[]>([]);
     const [rating, setRating] = useState<number | null>(null);
-    const [instruction, setInstruction] = useState<string | null>(null);
+    const [instruction, setInstruction] = useState<string >("");
     const [cookingTimeInMinutes, setCookingTimeInMinutes] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -72,14 +72,42 @@ function RecipeForm() {
 
 
     useEffect(() => {
-        getAllCategories()
-            .then(data => {
-                setAllCategories(data)
-            })
-            .catch(err => {
-                console.error(err)
-            })
-    })
+        const loadCategories = async () => {
+            try {
+                const data = await getAllCategories();
+                setAllCategories(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        loadCategories();
+
+    }, [])
+
+
+    useEffect(() => {
+        if (!isEdit || !id)
+            return
+
+        const loadRecipe = async () => {
+            try {
+                const data = await getRecipeDateilById(id)
+
+                setTitle(data.recipe.title);
+                setRating(data.recipe.rating);
+                setInstruction(data.recipe.instruction ?? "");
+                setCookingTimeInMinutes(data.recipe.cookingTimeInMinutes);
+                setCategoryNames(data.recipe.categories);
+            }
+            catch (err) {
+                setError(err instanceof Error ? err.message : "Unexpected error");
+            }
+        }
+
+        loadRecipe();
+
+    }, [id, isEdit]);
 
 
 
@@ -106,7 +134,10 @@ function RecipeForm() {
                     <TextField
                         label="Doba přípřavy (min)"
                         type="number"
-                        value={cookingTimeInMinutes}
+                        value={cookingTimeInMinutes ?? ""}
+                        slotProps={{
+                            htmlInput: { min: 0, step: 1 },
+                        }}
                         onChange={e => setCookingTimeInMinutes(e.target.value === "" ? null : Number(e.target.value))}
                     />
 

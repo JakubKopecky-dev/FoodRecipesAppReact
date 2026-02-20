@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import type { DetailRecipe } from "../../types/recipe/DetailRecipe";
-import { getRecipeDateilById } from "../../api/recipeApi";
-import { Alert, Box, Chip, CircularProgress, Paper, Rating, Stack, Typography } from "@mui/material";
+import { deleteRecipe, getRecipeDateilById } from "../../api/recipeApi";
+import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogTitle, IconButton, Paper, Rating, Stack, Typography } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Edit } from "@mui/icons-material";
 
 
 function RecipeDetail() {
@@ -10,23 +12,51 @@ function RecipeDetail() {
     const [recipe, setRecipe] = useState<DetailRecipe | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
+
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!id) return
+        if (!id) return;
 
-        getRecipeDateilById(id)
-            .then(data => {
+        const loadRecipe = async () => {
+            try {
+                const data = await getRecipeDateilById(id);
                 setRecipe(data);
-            })
-            .catch(err => {
-                setError(err.message);
-            })
-            .finally(() => {
+            }
+            catch (err) {
+                setError(err instanceof Error ? err.message : "Unexpected error");
+            }
+            finally {
                 setLoading(false);
-            })
+            }
+        };
+
+        loadRecipe();
 
     }, [id]);
+
+
+    const deleteRecipeHandler = async (id: string) => {
+        try {
+            await deleteRecipe(id);
+            setOpenDeleteDialog(false);
+            navigate("/recipes");
+        }
+        catch (err) {
+            setError(err instanceof Error ? err.message : "Unexpected error");
+        }
+
+
+    }
+
+
+    const editRecipeHandler = (id: string) => {
+        navigate(`/recipes/${id}/edit`)
+    }
+
+
 
 
     if (loading)
@@ -145,6 +175,56 @@ function RecipeDetail() {
                 </Box>
 
             </Stack>
+
+            <Stack direction="row" justifyContent="flex-end" sx={{mb: 1, mr: 1}} spacing={4}>
+
+
+                <IconButton onClick={() => editRecipeHandler(recipe.recipe.id)}>
+                    <Edit
+                        sx={{
+                            fontSize: 40,
+                            color: "rgb(151, 151, 151)",
+                            
+                        }}
+                    />
+                </IconButton>
+
+                <IconButton onClick={() => setOpenDeleteDialog(true)}>
+                    <DeleteIcon
+                        sx={{
+                            fontSize: 40,
+                            color: "rgb(151, 151, 151)",
+                        }}
+
+                    />
+                </IconButton>
+
+            </Stack>
+
+            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+                <DialogTitle>
+                    Opravdu chceš smazat recept {recipe.recipe.title}
+                </DialogTitle>
+
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                        Zrušit
+                    </Button>
+
+                    <Button color="error" onClick={() => deleteRecipeHandler(recipe.recipe.id)}>
+                        Smazat
+                    </Button>
+                </DialogActions>
+
+            </Dialog>
+
+
+
+
+
+
+
+
 
         </Paper>
     );
