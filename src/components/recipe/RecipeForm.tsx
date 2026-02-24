@@ -15,7 +15,7 @@ function RecipeForm() {
     const [title, setTitle] = useState<string>("");
     const [categoryNames, setCategoryNames] = useState<string[]>([]);
     const [rating, setRating] = useState<number | null>(null);
-    const [instruction, setInstruction] = useState<string >("");
+    const [instruction, setInstruction] = useState<string>("");
     const [cookingTimeInMinutes, setCookingTimeInMinutes] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -65,8 +65,8 @@ function RecipeForm() {
             navigate("/recipes")
 
         }
-        catch (err: any) {
-            setError(err.message)
+        catch (err) {
+            setError(err instanceof Error ? err.message : "Unexpected error");
         }
     }
 
@@ -196,7 +196,6 @@ function RecipeForm() {
                 {error && <Alert severity="error">
                     {error}
                 </Alert>}
-
 
 
             </Stack>

@@ -4,7 +4,8 @@ import type { DetailRecipe } from "../../types/recipe/DetailRecipe";
 import { deleteRecipe, getRecipeDateilById } from "../../api/recipeApi";
 import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogTitle, IconButton, Paper, Rating, Stack, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Edit } from "@mui/icons-material";
+import { Add, Edit } from "@mui/icons-material";
+import IngredientDialog from "../ingredient/CreateIngredientDialog";
 
 
 function RecipeDetail() {
@@ -12,7 +13,8 @@ function RecipeDetail() {
     const [recipe, setRecipe] = useState<DetailRecipe | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+    const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
+    const [ingredienteDialog, setIngredienteDialog] = useState<boolean>(false);
 
 
     const navigate = useNavigate();
@@ -41,7 +43,7 @@ function RecipeDetail() {
     const deleteRecipeHandler = async (id: string) => {
         try {
             await deleteRecipe(id);
-            setOpenDeleteDialog(false);
+            setDeleteDialog(false);
             navigate("/recipes");
         }
         catch (err) {
@@ -144,9 +146,22 @@ function RecipeDetail() {
 
                 <Box sx={{ flex: 1, py: 1 }}>
                     <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.paper' }}>
-                        <Typography sx={{ fontWeight: 600, mb: 1 }}>
-                            Ingredience
-                        </Typography>
+                        <Stack direction="row" justifyContent="space-between">
+                            <Typography sx={{ fontWeight: 600, mb: 1 }}>
+                                Ingredience
+                            </Typography>
+
+                            <IconButton onClick={() => setIngredienteDialog(true)}>
+                                <Add
+                                    sx={{
+                                        fontSize: 15,
+                                        color: "rgb(151, 151, 151)",
+
+                                    }}
+                                />
+                            </IconButton>
+
+                        </Stack>
 
                         <Stack spacing={1}>
                             {recipe.ingredients.map(ingre => (
@@ -176,7 +191,7 @@ function RecipeDetail() {
 
             </Stack>
 
-            <Stack direction="row" justifyContent="flex-end" sx={{mb: 1, mr: 1}} spacing={4}>
+            <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, mr: 1 }} spacing={4}>
 
 
                 <IconButton onClick={() => editRecipeHandler(recipe.recipe.id)}>
@@ -184,12 +199,12 @@ function RecipeDetail() {
                         sx={{
                             fontSize: 40,
                             color: "rgb(151, 151, 151)",
-                            
+
                         }}
                     />
                 </IconButton>
 
-                <IconButton onClick={() => setOpenDeleteDialog(true)}>
+                <IconButton onClick={() => setDeleteDialog(true)}>
                     <DeleteIcon
                         sx={{
                             fontSize: 40,
@@ -201,13 +216,13 @@ function RecipeDetail() {
 
             </Stack>
 
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+            <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
                 <DialogTitle>
-                    Opravdu chceš smazat recept {recipe.recipe.title}
+                    Opravdu chceš smazat recept {recipe.recipe.title}?
                 </DialogTitle>
 
                 <DialogActions>
-                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                    <Button onClick={() => setDeleteDialog(false)}>
                         Zrušit
                     </Button>
 
@@ -218,13 +233,11 @@ function RecipeDetail() {
 
             </Dialog>
 
-
-
-
-
-
-
-
+            <IngredientDialog
+                open={ingredienteDialog}
+                recipeId={recipe.recipe.id}
+                onClose={() => setIngredienteDialog(false)}
+            />
 
         </Paper>
     );

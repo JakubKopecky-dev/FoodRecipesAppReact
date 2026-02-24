@@ -2,5 +2,5 @@ export type IngredientUnit =
     'Kilogram'
     | 'Gram'
     | 'Liter'
-    | 'Mililiter'
+    | 'Milliliter'
     | 'Piece'

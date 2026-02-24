@@ -4,5 +4,5 @@ export interface CreateUpdateIngredient{
         title: string
         unit: IngredientUnit
         quantity: number
-        recipeId: number
+        recipeId: string
 }
