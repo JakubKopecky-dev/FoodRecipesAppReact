@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"
 import type { DetailRecipe } from "../../types/recipe/DetailRecipe";
 import { deleteRecipe, getRecipeDateilById } from "../../api/recipeApi";
-import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogTitle, IconButton, Paper, Rating, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogTitle, IconButton, Paper, Rating, Snackbar, Stack, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Add, Edit } from "@mui/icons-material";
-import IngredientDialog from "../ingredient/CreateIngredientDialog";
+import IngredientDialog from "../ingredient/IngredientDialog";
+import { deleteIngredient } from "../../api/ingredientApi";
+import type { Ingredient } from "../../types/ingredient/Ingredient";
 
 
 function RecipeDetail() {
@@ -15,6 +17,9 @@ function RecipeDetail() {
     const [error, setError] = useState<string | null>(null);
     const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
     const [ingredienteDialog, setIngredienteDialog] = useState<boolean>(false);
+    const [ingredientToDelete, setIngredientToDelete] = useState<Ingredient | null>(null);
+    const [ingredientError, setIngredientError] = useState<string | null>(null);
+    const [ingredientToEdit, setIngredientToEdit] = useState<Ingredient | null>(null);
 
 
     const navigate = useNavigate();
@@ -40,9 +45,9 @@ function RecipeDetail() {
     }, [id]);
 
 
-    const deleteRecipeHandler = async (id: string) => {
+    const deleteRecipeHandler = async (recipeId: string) => {
         try {
-            await deleteRecipe(id);
+            await deleteRecipe(recipeId);
             setDeleteDialog(false);
             navigate("/recipes");
         }
@@ -54,10 +59,27 @@ function RecipeDetail() {
     }
 
 
-    const editRecipeHandler = (id: string) => {
-        navigate(`/recipes/${id}/edit`)
+    const editRecipeHandler = (recipeId: string) => {
+        navigate(`/recipes/${recipeId}/edit`)
     }
 
+    const deleteIngredientHandler = async (ingredientId: string) => {
+        try {
+            await deleteIngredient(ingredientId);
+            setIngredientToDelete(null);
+            setRecipe(prev =>
+                prev
+                    ? {
+                        ...prev,
+                        ingredients: prev.ingredients.filter(i => i.id !== ingredientId)
+                    }
+                    : prev
+            )
+        }
+        catch (err) {
+            setIngredientError(err instanceof Error ? err.message : "Unexpected error")
+        }
+    }
 
 
 
@@ -84,138 +106,169 @@ function RecipeDetail() {
 
 
     return (
-        <Paper
-            sx={{
-                width: '100%',
-                maxWidth: 1000,
-                mx: 'auto',
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-            }}>
+        <>
+            <Paper
+                sx={{
+                    width: '100%',
+                    maxWidth: 1000,
+                    mx: 'auto',
+                    bgcolor: 'background.paper',
+                    borderRadius: 2,
+                }}>
 
-            <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{ p: 2, bgcolor: '#e3e6ff' }}
-            >
-                {/* Title */}
-                <Typography fontSize={26}>
-                    {recipe.recipe.title}
-                </Typography>
-
-
-                <Stack direction="row" alignItems="center">
-
-                    {/* Time + Rating */}
-                    <Stack direction="row" spacing={4} alignItems="center">
-                        <Typography>
-                            ⏱ {recipe.recipe.cookingTimeInMinutes} min
-                        </Typography>
-
-                        <Rating value={recipe.recipe.rating} readOnly size="small" />
-
-                    </Stack>
-
-                    {/* Categories */}
-                    <Stack
-                        direction="row"
-                        spacing={1}
-                        flexWrap="wrap"
-                        sx={{ ml: 5 }}
-                    >
-                        {recipe.recipe.categories.map(category => (
-                            <Chip key={category} label={category} />
-                        ))}
-                    </Stack>
-
-                </Stack>
-            </Stack>
-
-            <Stack direction="row" spacing={4} sx={{ pt: 1, px: 2, pb: 5 }}>
-
-                <Box sx={{ flex: 1 }}>
-                    <Typography sx={{
-                        textAlign: "justify",
-                        lineHeight: 1.8,
-                        hyphens: "auto"
-                    }} >
-                        {recipe.recipe.instruction}
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ p: 2, bgcolor: '#e3e6ff' }}
+                >
+                    {/* Title */}
+                    <Typography fontSize={26}>
+                        {recipe.recipe.title}
                     </Typography>
-                </Box>
 
-                <Box sx={{ flex: 1, py: 1 }}>
-                    <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.paper' }}>
-                        <Stack direction="row" justifyContent="space-between">
-                            <Typography sx={{ fontWeight: 600, mb: 1 }}>
-                                Ingredience
+
+                    <Stack direction="row" alignItems="center">
+
+                        {/* Time + Rating */}
+                        <Stack direction="row" spacing={4} alignItems="center">
+                            <Typography>
+                                ⏱ {recipe.recipe.cookingTimeInMinutes} min
                             </Typography>
 
-                            <IconButton onClick={() => setIngredienteDialog(true)}>
-                                <Add
-                                    sx={{
-                                        fontSize: 15,
-                                        color: "rgb(151, 151, 151)",
-
-                                    }}
-                                />
-                            </IconButton>
+                            <Rating value={recipe.recipe.rating} readOnly size="small" />
 
                         </Stack>
 
-                        <Stack spacing={1}>
-                            {recipe.ingredients.map(ingre => (
-                                <Stack
-                                    key={ingre.id}
-                                    direction="row"
-                                    sx={{
-                                        py: 0.75,
-                                        borderBottom: 1,
-                                        borderColor: 'divider',
-                                        '&:last-of-type': { borderBottom: 0 },
-                                    }}
-                                >
-                                    <Typography sx={{ flex: 1 }}>
-                                        {ingre.title}
-                                    </Typography>
 
-                                    <Typography sx={{ width: 150 }}>
-                                        {ingre.quantity} {ingre.unit}
-                                    </Typography>
-                                </Stack>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            flexWrap="wrap"
+                            sx={{ ml: 5 }}
+                        >
+                            {recipe.recipe.categories.map(category => (
+                                <Chip key={category} label={category} />
                             ))}
                         </Stack>
-                    </Paper>
 
-                </Box>
+                    </Stack>
+                </Stack>
 
-            </Stack>
+                <Stack direction="row" spacing={4} sx={{ pt: 1, px: 2, pb: 5 }}>
 
-            <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, mr: 1 }} spacing={4}>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography sx={{
+                            textAlign: "justify",
+                            lineHeight: 1.8,
+                            hyphens: "auto"
+                        }} >
+                            {recipe.recipe.instruction}
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ flex: 1, py: 1 }}>
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.paper' }}>
+                            <Stack direction="row" justifyContent="space-between">
+                                <Typography sx={{ fontWeight: 600, mb: 1 }}>
+                                    Ingredience
+                                </Typography>
+
+                                <IconButton onClick={() => setIngredienteDialog(true)}>
+                                    <Add
+                                        sx={{
+                                            fontSize: 25,
+                                            color: "rgb(151, 151, 151)",
+
+                                        }}
+                                    />
+                                </IconButton>
+
+                            </Stack>
+
+                            <Stack spacing={1}>
+                                {recipe.ingredients.map(ingre => (
+                                    <Stack
+                                        key={ingre.id}
+                                        direction="row"
+                                        sx={{
+                                            py: 0.75,
+                                            borderBottom: 1,
+                                            borderColor: 'divider',
+                                            '&:last-of-type': { borderBottom: 0 },
+                                        }}
+                                    >
+                                        <Typography sx={{ flex: 1 }}>
+                                            {ingre.title}
+                                        </Typography>
+
+                                        <Typography sx={{ width: 150 }}>
+                                            {ingre.quantity} {ingre.unit}
+                                        </Typography>
 
 
-                <IconButton onClick={() => editRecipeHandler(recipe.recipe.id)}>
-                    <Edit
-                        sx={{
-                            fontSize: 40,
-                            color: "rgb(151, 151, 151)",
 
-                        }}
-                    />
-                </IconButton>
+                                        <IconButton
+                                            onClick={() => setIngredientToEdit(ingre)}
+                                        >
+                                            <Edit
+                                                sx={{
+                                                    fontSize: 18,
+                                                    color: "rgb(151, 151, 151)"
+                                                }}
+                                            />
+                                        </IconButton>
 
-                <IconButton onClick={() => setDeleteDialog(true)}>
-                    <DeleteIcon
-                        sx={{
-                            fontSize: 40,
-                            color: "rgb(151, 151, 151)",
-                        }}
+                                        <IconButton
+                                            onClick={() => setIngredientToDelete(ingre)}
+                                        >
+                                            <DeleteIcon
+                                                sx={{
+                                                    fontSize: 18,
+                                                    color: "rgb(151, 151, 151)"
+                                                }}
+                                            />
+                                        </IconButton>
+                                    </Stack>
+                                ))}
+                            </Stack>
+                        </Paper>
 
-                    />
-                </IconButton>
+                    </Box>
 
-            </Stack>
+                </Stack>
 
+                <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1, mr: 1 }} spacing={4}>
+
+
+                    <IconButton onClick={() => editRecipeHandler(recipe.recipe.id)}>
+                        <Edit
+                            sx={{
+                                fontSize: 40,
+                                color: "rgb(151, 151, 151)",
+
+                            }}
+                        />
+                    </IconButton>
+
+                    <IconButton onClick={() => setDeleteDialog(true)}>
+                        <DeleteIcon
+                            sx={{
+                                fontSize: 40,
+                                color: "rgb(151, 151, 151)",
+                            }}
+
+                        />
+                    </IconButton>
+
+                </Stack>
+
+
+
+            </Paper>
+
+
+            {/* DIALOGS */}
             <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
                 <DialogTitle>
                     Opravdu chceš smazat recept {recipe.recipe.title}?
@@ -234,12 +287,83 @@ function RecipeDetail() {
             </Dialog>
 
             <IngredientDialog
-                open={ingredienteDialog}
+                open={ingredienteDialog || Boolean(ingredientToEdit)}
                 recipeId={recipe.recipe.id}
-                onClose={() => setIngredienteDialog(false)}
+                ingredient={ingredientToEdit ?? undefined}
+                onClose={() => {
+                    setIngredienteDialog(false);
+                    setIngredientToEdit(null);
+                }}
+                onCreated={newIngredient =>
+                    setRecipe(prev =>
+                        prev
+                            ? {
+                                ...prev,
+                                ingredients: [...prev.ingredients, newIngredient]
+                            }
+                            : prev
+                    )
+                }
+                onUpdated={updatedIngredient =>
+                    setRecipe(prev =>
+                        prev 
+                        ?{
+                            ...prev,
+                            ingredients: prev.ingredients.map( i=> i.id === updatedIngredient.id ? updatedIngredient: i )
+                        }
+                        : prev
+                    )
+                }
+                onError={message => {
+                    setIngredientError(message);
+                }}
             />
 
-        </Paper>
+
+
+            <Dialog open={Boolean(ingredientToDelete)} onClose={() => setIngredientToDelete(null)}>
+                {ingredientToDelete &&
+                    <>
+                        <DialogTitle>
+                            Opravdu chceš smazat ingredienci {ingredientToDelete.title}?
+                        </DialogTitle>
+
+                        <DialogActions>
+                            <Button onClick={() => {
+                                setIngredientToDelete(null);
+                            }}>
+                                Zrušit
+                            </Button>
+
+                            <Button color="error" onClick={() => deleteIngredientHandler(ingredientToDelete.id)}>
+                                Smazat
+                            </Button>
+                        </DialogActions>
+                    </>
+                }
+            </Dialog>
+
+
+            {/* Alerts */}
+            <Snackbar
+                open={Boolean(ingredientError)}
+                autoHideDuration={5000}
+                onClose={() => setIngredientError(null)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert
+                    severity="error"
+                    onClose={() => setIngredientError(null)}
+                    sx={{ width: "100%" }}
+                >
+                    {ingredientError}
+                </Alert>
+            </Snackbar>
+
+
+
+        </>
+
     );
 
 }
