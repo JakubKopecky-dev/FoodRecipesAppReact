@@ -1,10 +1,14 @@
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 
 function MainMenu() {
+    const location = useLocation()
     const navigate = useNavigate();
+
+    const isOnList = location.pathname === "/recipes";
+
 
 
     return (
@@ -35,18 +39,20 @@ function MainMenu() {
 
                 <Stack direction="row" spacing={5}>
                     {/* Button vpravo */}
-                    <Button
-                        variant="contained"
-                        sx={{
-                            textTransform: "none",
-                            fontWeight: 600,
- 
-                            fontSize: 16
-                        }}
-                        onClick={() => navigate("/recipes")}
-                    >
-                        Přehled receptů
-                    </Button>
+
+                    {!isOnList &&
+                        <Button
+                            variant="contained"
+                            sx={{
+                                textTransform: "none",
+                                fontWeight: 600,
+
+                                fontSize: 16
+                            }}
+                            onClick={() => navigate("/recipes")}
+                        >
+                            Přehled receptů
+                        </Button>}
 
                     {/* Button vpravo */}
                     <Button
@@ -54,7 +60,7 @@ function MainMenu() {
                         sx={{
                             textTransform: "none",
                             fontWeight: 600,
-            
+
                             fontSize: 16
                         }}
                         onClick={() => navigate("/recipes/create")}
