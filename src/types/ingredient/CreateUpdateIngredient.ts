@@ -1,6 +1,6 @@
 import type { IngredientUnit } from "./IngredientUnit"
 
-export interface CreateUpdateIngredient{
+export type CreateUpdateIngredient = {
         title: string
         unit: IngredientUnit
         quantity: number

@@ -1,4 +1,4 @@
-export interface Recipe{
+export type Recipe ={
     id: string
     title: string
     createdAt: string

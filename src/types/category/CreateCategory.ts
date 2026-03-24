@@ -1,3 +1,3 @@
-export interface CreateCategory{
+export type CreateCategory = {
     title: string
 }

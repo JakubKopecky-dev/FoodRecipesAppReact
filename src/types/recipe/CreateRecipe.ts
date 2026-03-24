@@ -1,4 +1,4 @@
-export interface CreateRecipe {
+export type CreateRecipe = {
     title: string
     categoryNames: string[]
     rating: number | null

@@ -1,3 +1,3 @@
-export interface PatchRecipeCategories{
+export type PatchRecipeCategories = {
     categories: string[]
 }

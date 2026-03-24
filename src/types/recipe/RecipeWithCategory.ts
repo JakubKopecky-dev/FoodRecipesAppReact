@@ -1,4 +1,4 @@
-export interface RecipeWithCategory {
+export type RecipeWithCategory ={
     id: string
     title: string
     createdAt: string

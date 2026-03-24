@@ -1,6 +1,6 @@
 import type { IngredientUnit } from "./IngredientUnit"
 
-export interface Ingredient{
+export type Ingredient = {
     id: string
     title: string
     createdAt: string
